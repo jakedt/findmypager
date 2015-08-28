@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.blue-light_blue.min.css" />
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      .mdl-layout__header-row {
+        padding-left: 48px;
+      }
+
+      main.mdl-layout__content {
+        padding: 32px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mdl-layout mdl-js-layout">
+      <div class="mdl-layout__header mdl-layout__header--scroll">
+        <div class="mdl-layout__header-row">
+          <div class="mdl-layout-title">Find my Pager</div>
+        </div>
+      </div>
+
+      <main class="mdl-layout__content mdl-color-text--grey-600">
+        {% if login_failed %}
+          <div>Login failed</div>
+        {% endif %}
+
+        <form action="/" method="post">
+          <div class="mdl-grid">
+            <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--4-col {% if credential.email %}is-dirty{% endif %}">
+              <input class="mdl-textfield__input" type="email" name="email" value="{{ credential.email }}"/>
+              <label class="mdl-textfield__label" for="email">Email...</label>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--4-col {% if credential.password %}is-dirty{% endif %}">
+              <input class="mdl-textfield__input" type="password" name="password" value="{{ credential.password }}" />
+              <label class="mdl-textfield__label" for="password">Password...</label>
+            </div>
+          </div>
+
+          {% if devices %}
+            <div class="mdl-grid">
+              <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                <thead>
+                  <th></th>
+                  <th class="mdl-data-table__cell--non-numeric">Device Name</th>
+                  <th class="mdl-data-table__cell--non-numeric">Device Type</th>
+                </thead>
+                <tbody>
+                  {% for deviceid, (friendly, devicetype) in devices.iteritems() %}
+                    <tr>
+                      <td class="mdl-data-table__cell--non-numeric">
+                        <input type="radio" id="{{ deviceid }}" class="mdl-radio__button mdl-radio mdl-js-radio " name="device" value="{{ deviceid }}" {% if deviceid == credential.deviceid %}checked{% endif %} />
+                      </td>
+                      <td class="mdl-data-table__cell--non-numeric"><label for="{{ deviceid }}" class="mdl-radio__label mdl-js-ripple-effect">{{ friendly }}</label></td><td class="mdl-data-table__cell--non-numeric"><label for="{{ deviceid }}" class="mdl-radio__label mdl-js-ripple-effect">{{ devicetype }}</label></td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+
+          <div class="mdl-grid">
+            <div class="mdl-cell--4-col">
+              <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" type="submit" value="Save credentials.">
+            </div>
+          </div>
+
+          {% if credential.deviceid and credential.email and credential.password %}
+          <div class="mdl-grid">
+            <div class="mdl-cell--8-col">{{ credential.uuid }}@findmypager.appspotmail.com</div>
+          </div>
+          {% endif %}
+        </form>
+      </main>
+    </div>
+  </body>
+</html>
+{% endautoescape %}
