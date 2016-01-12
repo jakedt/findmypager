@@ -2,10 +2,9 @@ import logging as logger
 import webapp2
 
 from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
-from pyicloud.exceptions import PyiCloudFailedLoginException
 from email.utils import parseaddr
 
-from data import ICloudCredential, CredentialCookieProvider, CookieiCloudService
+from data import ICloudCredential, send_notification
 
 ALERT_SEARCH_TERM = 'PagerDuty ALERT'
 
@@ -32,21 +31,7 @@ class FileAlert(InboundMailHandler):
         logger.warning('No deviceid selected for credential with uuid: %s', uuid)
         return
 
-      cookie_jar = CredentialCookieProvider(credential)
-      try:
-        api = CookieiCloudService(credential.email, credential.password, cookie_jar)
-      except PyiCloudFailedLoginException:
-        logger.warning('Unable to login to iCloud for credential with uuid: %s', uuid)
-        return
-
-      all_devices = api.devices
-
-      if credential.deviceid not in all_devices.keys():
-        logger.warning('Selected device not available: %s, devices: %s, credential uuid: %s',
-                       credential.deviceid, all_devices.keys(), uuid)
-        return
-
-      all_devices[credential.deviceid].play_sound()
+      send_notification(credential, uuid)
 
     else:
       logger.info('Mail was not a pagerduty alert: %s', mail_message.subject)

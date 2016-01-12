@@ -1,82 +1,136 @@
 <!DOCTYPE html>
-{% autoescape true %}
 <html>
   <head>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.blue-light_blue.min.css" />
-    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
     <style>
-      .mdl-layout__header-row {
-        padding-left: 48px;
+      body {
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #eee;
       }
 
-      main.mdl-layout__content {
-        padding: 32px;
+      .form-signin {
+        max-width: 330px;
+        padding: 15px;
+        margin: 0 auto;
+      }
+      .form-signin .form-signin-heading,
+      .form-signin .checkbox {
+        margin-bottom: 10px;
+      }
+      .form-signin .checkbox {
+        font-weight: normal;
+      }
+      .form-signin .form-control {
+        position: relative;
+        height: auto;
+        -webkit-box-sizing: border-box;
+           -moz-box-sizing: border-box;
+                box-sizing: border-box;
+        padding: 10px;
+        font-size: 16px;
+      }
+      .form-signin .form-control:focus {
+        z-index: 2;
+      }
+      .form-signin input[type="email"] {
+        margin-bottom: -1px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+      .form-signin input[type="password"] {
+        margin-bottom: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
+
+      .form-select-device {
+        max-width: 330px;
+        padding: 15px;
+        margin: 0 auto;
       }
     </style>
   </head>
   <body>
-    <div class="mdl-layout mdl-js-layout">
-      <div class="mdl-layout__header mdl-layout__header--scroll">
-        <div class="mdl-layout__header-row">
-          <div class="mdl-layout-title">Find my Pager</div>
-        </div>
-      </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
-      <main class="mdl-layout__content mdl-color-text--grey-600">
-        {% if login_failed %}
-          <div>Login failed</div>
-        {% endif %}
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
-        <form action="/" method="post">
-          <div class="mdl-grid">
-            <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--4-col {% if credential.email %}is-dirty{% endif %}">
-              <input class="mdl-textfield__input" type="email" name="email" value="{{ credential.email }}"/>
-              <label class="mdl-textfield__label" for="email">Email...</label>
-            </div>
-            <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--4-col {% if credential.password %}is-dirty{% endif %}">
-              <input class="mdl-textfield__input" type="password" name="password" value="{{ credential.password }}" />
-              <label class="mdl-textfield__label" for="password">Password...</label>
-            </div>
-          </div>
+    <div class="container">
+      <form class="form-signin" id="signin">
+        <h2 class="form-signin-heading">iCloud Credentials</h2>
+        <label for="inputEmail" class="sr-only">Email address</label>
+        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus value="{{ credential.email }}" name="inputEmail">
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required value="{{ credential.password }}" name="inputPassword">
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      </form>
 
-          {% if devices %}
-            <div class="mdl-grid">
-              <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
-                <thead>
-                  <th></th>
-                  <th class="mdl-data-table__cell--non-numeric">Device Name</th>
-                  <th class="mdl-data-table__cell--non-numeric">Device Type</th>
-                </thead>
-                <tbody>
-                  {% for deviceid, (friendly, devicetype) in devices.iteritems() %}
-                    <tr>
-                      <td class="mdl-data-table__cell--non-numeric">
-                        <input type="radio" id="{{ deviceid }}" class="mdl-radio__button mdl-radio mdl-js-radio " name="device" value="{{ deviceid }}" {% if deviceid == credential.deviceid %}checked{% endif %} />
-                      </td>
-                      <td class="mdl-data-table__cell--non-numeric"><label for="{{ deviceid }}" class="mdl-radio__label mdl-js-ripple-effect">{{ friendly }}</label></td><td class="mdl-data-table__cell--non-numeric"><label for="{{ deviceid }}" class="mdl-radio__label mdl-js-ripple-effect">{{ devicetype }}</label></td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          {% endif %}
+      <form class="form-signin" id="selectDevice">
+        {% include 'devices.html' %}
+      </form>
 
-          <div class="mdl-grid">
-            <div class="mdl-cell--4-col">
-              <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" type="submit" value="Save credentials.">
-            </div>
-          </div>
+      <form class="form-signin" id="testDevice">
+        {% if not login_failed %}{% include 'testdevice.html' %}{% endif %}
+      </form>
+    </div> <!-- /container -->
 
-          {% if credential.deviceid and credential.email and credential.password %}
-          <div class="mdl-grid">
-            <div class="mdl-cell--8-col">{{ credential.uuid }}@findmypager.appspotmail.com</div>
-          </div>
-          {% endif %}
-        </form>
-      </main>
-    </div>
+    <script>
+      // this is the id of the form
+      $("#signin").submit(function(e) {
+        var url = "/credential"; // the script where you handle the form input.
+        $.ajax({
+          type: "POST",
+          url: url,
+          data: $("#signin").serialize(), // serializes the form's elements.
+          success: function(data)
+          {
+            $("#selectDevice").empty();
+            $("#testDevice").empty();
+            $("#selectDevice").append(data);
+          }
+        });
+        e.preventDefault(); // avoid to execute the actual submit of the form.
+      });
+
+      $("#selectDevice").submit(function(e) {
+        var url = "/device"; // the script where you handle the form input.
+        $.ajax({
+          type: "POST",
+          url: url,
+          data: $("#selectDevice").serialize(), // serializes the form's elements.
+          success: function(data)
+          {
+            $("#testDevice").empty();
+            $("#testDevice").append(data);
+          }
+        });
+        e.preventDefault(); // avoid to execute the actual submit of the form.
+      });
+
+      $("#testDevice").submit(function(e) {
+        var url = "/test"; // the script where you handle the form input.
+        $.ajax({
+          type: "POST",
+          url: url,
+          success: function(data)
+          {
+            alert(data);
+          }
+        });
+        e.preventDefault(); // avoid to execute the actual submit of the form.
+      });
+    </script>
   </body>
 </html>
-{% endautoescape %}

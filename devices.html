@@ -1,0 +1,18 @@
+{% if devices %}
+<h2 class="form-signin-heading">Select device</h2>
+{% for deviceid, (friendly, devicetype) in devices.iteritems() %}
+<div class="radio">
+  <label>
+    <input type="radio" name="deviceid" id="{{ deviceid }}" value="{{ deviceid }}" {% if credential.deviceid == deviceid %}checked{% endif %}>
+    {{ friendly }}
+  </label>
+</div>
+{% endfor %}
+<button class="btn btn-lg btn-primary btn-block" type="submit">Save Device</button>
+{% elif not login_failed %}
+<!-- no devices -->
+<h2 class="form-signin-heading">No Devices</h2>
+{% else %}
+<!-- login failed -->
+<h2 class="form-signin-heading">Login Failed</h2>
+{% endif %}

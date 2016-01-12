@@ -5,6 +5,7 @@ import json
 from google.appengine.ext import ndb
 from google.appengine.api import users
 from uuid import uuid4
+from pyicloud.exceptions import PyiCloudFailedLoginException
 
 
 pyicloud.base.os.mkdir = lambda x: None
@@ -56,3 +57,40 @@ def get_or_create_credential():
     created = ICloudCredential(id=user_id, email='', password='', uuid=str(uuid4()))
     return created, True
   return found, False
+
+
+def load_devices(credential):
+  devices = {}
+  login_failed = False
+  cookie_jar = CredentialCookieProvider(credential)
+  login_failed = True
+  try:
+    api = CookieiCloudService(credential.email, credential.password, cookie_jar)
+    login_failed = False
+    devices = {deviceid: (dev['name'], dev['deviceDisplayName'])
+               for deviceid, dev in api.devices.items()
+               if dev['deviceDisplayName'].find('MacBook') < 0}
+  except PyiCloudFailedLoginException:
+    logger.warning('iCloud login failed')
+
+  logger.info('devices: %s', devices)
+
+  return devices, login_failed
+
+
+def send_notification(credential, uuid):
+  cookie_jar = CredentialCookieProvider(credential)
+  try:
+    api = CookieiCloudService(credential.email, credential.password, cookie_jar)
+  except PyiCloudFailedLoginException:
+    logger.warning('Unable to login to iCloud for credential with uuid: %s', uuid)
+    return
+
+  all_devices = api.devices
+
+  if credential.deviceid not in all_devices.keys():
+    logger.warning('Selected device not available: %s, devices: %s, credential uuid: %s',
+                   credential.deviceid, all_devices.keys(), uuid)
+    return
+
+  all_devices[credential.deviceid].play_sound()
