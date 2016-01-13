@@ -30,6 +30,9 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class MainHandler(webapp2.RequestHandler):
   def get(self):
+    login_failed = False
+    devices = {}
+
     credential, new_credential = get_or_create_credential()
 
     logger.info('credential %s', credential)
